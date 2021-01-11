@@ -1,9 +1,17 @@
 apiVersion: 1
 
 datasources:
-- name: Prometheus
+- name: monero-exporter
   type: prometheus
-  url: http://prometheus:9090
+  url: http://monero-exporter:9090
   access: proxy
   isDefault: true
+  timeInterval: 10s
+
+datasources:
+- name: process-exporter
+  type: prometheus
+  url: http://process-exporter:9256
+  access: proxy
+  isDefault: false
   timeInterval: 10s

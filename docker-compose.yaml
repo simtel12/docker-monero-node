@@ -29,18 +29,18 @@ services:
       GF_SERVER_ROOT_URL: ${GRAFANA_URL}
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_USERS_ALLOW_ORG_CREATE: "false"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_BASIC_ENABLED: "false"
-      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      # GF_USERS_ALLOW_SIGN_UP: "false"
+      # GF_USERS_ALLOW_ORG_CREATE: "false"
+      # GF_AUTH_ANONYMOUS_ENABLED: "true"
+      # GF_AUTH_BASIC_ENABLED: "false"
+      # GF_AUTH_DISABLE_LOGIN_FORM: "true"
     volumes:
       - ./files/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/default.yaml:ro
       - ./files/grafana/prometheus.yaml:/etc/grafana/provisioning/datasources/prometheus.yaml:ro
       - ./files/grafana/daemon_metrics.json:/var/lib/grafana/dashboards/daemon_metrics.json:ro
       - grafana:/var/lib/grafana
-  exporter:
-    container_name: exporter
+  monero-exporter:
+    container_name: monero-exporter
     build:
       context: dockerfiles
       dockerfile: monerod_exporter
@@ -50,6 +50,19 @@ services:
       PORT: 8080
     ports:
       - 127.0.0.1:8080:8080
+  process-exporter:
+    container_name: process-exporter
+    image: ncabatoff/process-exporter:0.7.5
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc
+      - ./files/prometheus/process-exporter:/config/process-exporter:ro
+    privileged: true
+    ports:
+      - 127.0.0.1:9256:9256
+    command:
+      process-exporter -procfs /host/proc -config.path /config/process-exporter
+      
   monerod:
     container_name: monerod
     build:
