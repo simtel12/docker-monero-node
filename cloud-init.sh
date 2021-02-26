@@ -32,6 +32,23 @@ resolver 1.1.1.1 valid=300s;
 resolver_timeout 5s;
 EOF
 cat << EOF > /etc/nginx/sites-enabled/${DOMAIN}.conf
+http {
+    upstream myapp1 {
+      server moonymcmoonface.node.xmrcannon.net:443
+      server sovereignstreetart.node.xmrcannon.net:443
+      server xmr-node-01.node.xmrcannon.net:443
+      server freedomofmoneybitches.node.xmrcannon.net:443
+      server rupee.node.xmrcannon.net:443
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://myapp1;
+        }
+    }
+}
 # Redirect inbound http to https
 server {
     listen 80 default_server;
