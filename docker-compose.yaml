@@ -1,6 +1,7 @@
 volumes:
   grafana:
   prometheus:
+  p2pool-data:
 
 x-common-config: &common-config
   logging:
