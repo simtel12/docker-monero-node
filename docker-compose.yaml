@@ -2,6 +2,9 @@ volumes:
   grafana:
   prometheus:
 
+networks:
+  monerod:
+
 x-common-config: &common-config
   logging:
     driver: json-file
