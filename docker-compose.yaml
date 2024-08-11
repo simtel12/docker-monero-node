@@ -108,7 +108,7 @@ services:
     <<: *common-config
 
   p2pool:
-    image: ghcr.io/sethforprivacy/p2pool:latest
+    image: sethsimmons/p2pool:latest
     restart: unless-stopped
     container_name: p2pool
     tty: true
@@ -118,14 +118,13 @@ services:
       - /dev/hugepages:/dev/hugepages:rw
     ports:
       - 3333:3333
-      - 37888:37888
       - 37889:37889
     command: >-
       --wallet "${P2POOL_WALLET}"
-      --stratum "0.0.0.0:3333" --p2p "0.0.0.0:37888" --zmq-port "18084"
+      --stratum "0.0.0.0:3333" --p2p "0.0.0.0:37889" --zmq-port "18084"
       --loglevel "0"
       --host "monerod" --rpc-port "18081" --mini
-#      --addpeers "65.21.227.114:37888,node.sethforprivacy.com:37888"
+      --addpeers "65.21.227.114:37889,node.sethforprivacy.com:37889"
     <<: *common-config
 
   xmrig:
