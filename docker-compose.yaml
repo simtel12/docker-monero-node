@@ -125,6 +125,7 @@ services:
       --loglevel "0"
       --host "monerod" --rpc-port "18081" --mini
 #      --addpeers "65.21.227.114:37888,node.sethforprivacy.com:37888"
+    <<: *common-config
 
   xmrig:
     image: metal3d/xmrig:latest
@@ -147,4 +148,4 @@ services:
           - driver: nvidia
             count: 1
             capabilities: [gpu]
-    <<: *log-config
+    <<: *common-config
