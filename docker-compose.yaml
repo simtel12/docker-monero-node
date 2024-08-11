@@ -35,7 +35,10 @@ services:
       - ${GRAF_PORT:-3000}:3000
     volumes:
       - grafana:/var/lib/grafana
-      - ./files/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - type: bind
+        source: ./files/grafana/grafana.ini
+        target: /etc/grafana/grafana.ini
+        read_only: true
       - ./files/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./files/grafana/dashboards:/var/lib/grafana/dashboards:ro
     environment:
