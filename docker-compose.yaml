@@ -2,17 +2,12 @@ volumes:
   grafana:
   prometheus:
 
-networks:
-  monerod:
-
 x-common-config: &common-config
   logging:
     driver: json-file
     options:
       max-size: "50m"
       max-file: "20"
-  networks:
-    - monerod
 
 services: 
   prometheus:
@@ -110,3 +105,46 @@ services:
         --add-priority-node=p2pmd.xmrvsbeast.com:18080
         --add-priority-node=nodes.hashvault.pro:18080
     <<: *common-config
+
+  p2pool:
+    image: ghcr.io/sethforprivacy/p2pool:latest
+    restart: unless-stopped
+    container_name: p2pool
+    tty: true
+    stdin_open: true
+    volumes:
+      - p2pool-data:/home/p2pool
+      - /dev/hugepages:/dev/hugepages:rw
+    ports:
+      - 3333:3333
+      - 37888:37888
+      - 37889:37889
+    command: >-
+      --wallet "${P2POOL_WALLET}"
+      --stratum "0.0.0.0:3333" --p2p "0.0.0.0:37888" --zmq-port "18084"
+      --loglevel "0"
+      --host "monerod" --rpc-port "18081" --mini
+#      --addpeers "65.21.227.114:37888,node.sethforprivacy.com:37888"
+
+  xmrig:
+    image: metal3d/xmrig:latest
+    restart: unless-stopped
+    privileged: true
+    container_name: xmrig
+    environment:
+      POOL_URL: "p2pool:3333"
+      POOL_USER: "${XMRIG_POOL_USER}"
+      POOL_PASS: "${XMRIG_POOL_PASS}"
+      PRIORITY: 0
+      CUDA: "false"
+      ACCESS_TOKEN: ${XMRIG_ACCESS_TOKEN}
+    volumes:
+      - /dev/hugepages:/dev/hugepages:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+    <<: *log-config
