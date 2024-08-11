@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     image: grafana/grafana:${GRAFANA_TAG:-10.1.4}
     ports:
-      - 127.0.0.1:${GRAF_PORT:-3000}:3000
+      - ${GRAF_PORT:-3000}:3000
     volumes:
       - grafana:/var/lib/grafana
       - ./files/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
@@ -85,11 +85,25 @@ services:
     restart: unless-stopped
     volumes:
       - ${DATA_DIR:-./data}:/data
+      - ${CONFIG_FILE}:/monoconf.conf
     ports:
       - ${P2P_PORT:-18080}:18080                    # p2p
       - ${RESTRICTED_PORT:-18081}:18081             # restricted rpc
-      - 127.0.0.1:${ZMQ_PORT:-18082}:18082          # zmq
+      - ${ZMQ_PORT:-18084}:18084                    # zmq
       - 127.0.0.1:${UNRESTRICTED_PORT:-18083}:18083 # unrestricted rpc
-    command:
-      monerod --data-dir=/data --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18081 --zmq-rpc-bind-ip=0.0.0.0 --zmq-rpc-bind-port=18082 --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18083 --non-interactive --confirm-external-bind --public-node --log-level=0 --enable-dns-blocklist --rpc-ssl=disabled
+    command: |
+      monerod
+        --data-dir=/data --prune-blockchain
+        --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 
+        --rpc-restricted-bind-ip=0.0.0.0 --rpc-restricted-bind-port=18081
+        --zmq-pub=tcp://0.0.0.0:18084
+        --rpc-bind-ip=0.0.0.0 --rpc-bind-port=18083 --rpc-ssl=disabled
+        --non-interactive --confirm-external-bind
+        --public-node --log-level=0
+        --out-peers=128 --in-peers=128
+        --limit-rate-up=21000 --limit-rate-down=21000
+        --block-sync-size=10 --db-sync-mode=fastest:async:1000
+        --no-igd --enable-dns-blocklist
+        --add-priority-node=p2pmd.xmrvsbeast.com:18080
+        --add-priority-node=nodes.hashvault.pro:18080
     <<: *log-config
