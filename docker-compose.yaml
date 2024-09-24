@@ -156,7 +156,7 @@ services:
     depends_on:
       - p2pool
     environment:
-      POOL_URL: "p2pool:3333"
+      POOL_URL: "${XMRIG_POOL_URL}"
       POOL_USER: "${XMRIG_POOL_USER}"
       POOL_PASS: "${XMRIG_POOL_PASS}"
       PRIORITY: 0
