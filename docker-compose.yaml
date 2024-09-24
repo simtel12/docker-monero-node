@@ -19,6 +19,7 @@ services:
       - --storage.tsdb.retention.time=${PROM_RETENTION:-360d}
     container_name: monerod_prometheus
     restart: unless-stopped
+    profiles: [db all]
     # ports:
     #   - 127.0.0.1:9090:9090
     volumes:
@@ -39,6 +40,7 @@ services:
       - ${GRAFANA_FILES}/grafana.ini:/etc/grafana/grafana.ini:ro
       - ${GRAFANA_FILES}/provisioning:/etc/grafana/provisioning:ro
       - ${GRAFANA_FILES}/dashboards:/var/lib/grafana/dashboards:ro
+    profiles: [db all]
     environment:
       HOSTNAME: grafana
       GF_SERVER_ROOT_URL: ${GRAFANA_URL}
@@ -61,6 +63,7 @@ services:
     restart: unless-stopped
     # ports:
     #   - 127.0.0.1:9000:9000
+    profiles: [db all]
     command:
       - --monero-addr=http://monerod:${UNRESTRICTED_PORT:-18083}
     <<: *common-config
@@ -70,6 +73,7 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/nodemapper
+    profiles: [db all]
     environment:
       NODE_HOST: monerod
       NODE_PORT: 18083
@@ -90,6 +94,7 @@ services:
       - ${RESTRICTED_PORT:-18081}:18081             # restricted rpc
       - ${ZMQ_PORT:-18084}:18084                    # zmq
       - 127.0.0.1:${UNRESTRICTED_PORT:-18083}:18083 # unrestricted rpc
+    profiles: [monerod all]
     command: |
       monerod
         --data-dir=/data --prune-blockchain
@@ -113,6 +118,7 @@ services:
     container_name: p2pool
     tty: true
     stdin_open: true
+    profiles: [pool all]
     volumes:
       - p2pool-data:/home/p2pool
       - /dev/hugepages:/dev/hugepages:rw
@@ -132,6 +138,9 @@ services:
     restart: unless-stopped
     privileged: true
     container_name: xmrig
+    profiles: [miner all]
+    depends_on:
+      - p2pool
     environment:
       POOL_URL: "p2pool:3333"
       POOL_USER: "${XMRIG_POOL_USER}"
