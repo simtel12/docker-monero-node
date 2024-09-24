@@ -153,8 +153,6 @@ services:
     profiles:
       - miner
       - all
-    depends_on:
-      - p2pool
     environment:
       POOL_URL: "${XMRIG_POOL_URL}"
       POOL_USER: "${XMRIG_POOL_USER}"
