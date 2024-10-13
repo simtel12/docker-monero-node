@@ -1,7 +1,7 @@
-FROM ubuntu:22.04 as og
+FROM ubuntu:22.04 AS og
 
-ENV DEBIAN_FRONTEND noninteractive
-ARG threads
+ENV DEBIAN_FRONTEND=noninteractive
+ARG threads=4
 
 WORKDIR /opt/monero
 
