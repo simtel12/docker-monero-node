@@ -10,7 +10,7 @@ x-common-config: &common-config
       max-size: "50m"
       max-file: "20"
 
-services: 
+services:
   prometheus:
     image: prom/prometheus:${PROM_TAG:-v2.36.0}
     command:
@@ -61,9 +61,7 @@ services:
     <<: *common-config
   exporter:
     container_name: monerod_exporter
-    build:
-      context: .
-      dockerfile: dockerfiles/exporter
+    image: ${DOCKER_REGISTRY}monero-exporter:latest
     restart: unless-stopped
     # ports:
     #   - 127.0.0.1:9000:9000
@@ -74,11 +72,9 @@ services:
       - --monero-addr=http://monerod:${UNRESTRICTED_PORT:-18083}
     <<: *common-config
   nodemapper:
+    image: ${DOCKER_REGISTRY}monero-nodemapper
     container_name: monerod_nodemapper
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: dockerfiles/nodemapper
     profiles:
       - db
       - all
@@ -90,9 +86,7 @@ services:
     <<: *common-config
   monerod:
     container_name: monerod
-    build:
-      context: .
-      dockerfile: dockerfiles/monero
+    image: ${DOCKER_REGISTRY}monero:latest
     restart: unless-stopped
     volumes:
       - ${DATA_DIR:-./data}:/data
